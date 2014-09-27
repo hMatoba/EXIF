@@ -22,7 +22,6 @@ How to Use
     exif[271] = "Make"
     im1 = Image.new("RGBA", (16, 16))
     im1.save("im1.jpg", exif=exif.to_bytes())
-    im2 = Image.open("im1.jpg")
 
 
 Environment
