@@ -7,6 +7,7 @@ Use Exif object with PIL or Pillow.
 How to Use
 --------
     from PIL import Image
+    from EXIF import Exif
 
     d = {11: "PIL",
          272: "XXX-XXX",
