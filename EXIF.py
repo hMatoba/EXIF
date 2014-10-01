@@ -186,8 +186,7 @@ TAGS = {
            50982: {'name': 'ProfileLookTableData', 'type': 'Float'},
            51008: {'name': 'OpcodeList1', 'type': 'Undefined'},
            51009: {'name': 'OpcodeList2', 'type': 'Undefined'},
-           51022: {'name': 'OpcodeList3', 'type': 'Undefined'},
-           51041: {'name': 'NoiseProfile', 'type': 'Double'}},
+           51022: {'name': 'OpcodeList3', 'type': 'Undefined'}},
  'Photo': {33434: {'name': 'ExposureTime', 'type': 'Rational'},
            33437: {'name': 'FNumber', 'type': 'Rational'},
            34850: {'name': 'ExposureProgram', 'type': 'Short'},
@@ -217,7 +216,7 @@ TAGS = {
            37386: {'name': 'FocalLength', 'type': 'Rational'},
            37396: {'name': 'SubjectArea', 'type': 'Short'},
            37500: {'name': 'MakerNote', 'type': 'Undefined'},
-           37510: {'name': 'UserComment', 'type': 'Comment'},
+           37510: {'name': 'UserComment', 'type': 'Ascii'},
            37520: {'name': 'SubSecTime', 'type': 'Ascii'},
            37521: {'name': 'SubSecTimeOriginal', 'type': 'Ascii'},
            37522: {'name': 'SubSecTimeDigitized', 'type': 'Ascii'},
@@ -827,16 +826,16 @@ class Exif(dict):
             type_str = struct.pack(">H", TYPES[value_type])
             if value_type == "Byte":
                 length = 1
-                value_str = struct.pack('>I', raw_value)[3:4] + b"\x00" * 3
+                value_str = struct.pack('>B', raw_value)[0:1] + b"\x00" * 3
             elif value_type == "Short":
                 length = 2
-                value_str = struct.pack('>I', raw_value)[2:4] + b"\x00" * 2
+                value_str = struct.pack('>H', raw_value)[0:2] + b"\x00" * 2
             elif value_type == "Long":
-                length = 4
-                value_str = struct.pack('>I', raw_value)
+                length = 1
+                value_str = struct.pack('>L', raw_value)
             elif value_type == "SLong":
-                length = 4
-                value_str = struct.pack('>i', raw_value)
+                length = 1
+                value_str = struct.pack('>l', raw_value)
             elif value_type == "Ascii":
                 new_value = raw_value.encode() + b"\x00"
                 length = len(new_value)
