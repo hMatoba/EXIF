@@ -1,8 +1,8 @@
 EXIF
 ====
 
-[![Build Status](https://travis-ci.org/hugovk/EXIF.svg?branch=master)](https://travis-ci.org/hugovk/EXIF) 
-[![Coverage Status](https://coveralls.io/repos/hugovk/EXIF/badge.png?branch=master)](https://coveralls.io/r/hugovk/EXIF?branch=master)
+[![Build Status](https://travis-ci.org/hMatoba/EXIF.svg?branch=master)](https://travis-ci.org/hMatoba/EXIF)
+[![Coverage Status](https://coveralls.io/repos/hMatoba/EXIF/badge.png?branch=master)](https://coveralls.io/r/hMatoba/EXIF?branch=master)
 
 Use EXIF object with PIL or Pillow.
 
