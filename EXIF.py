@@ -778,12 +778,12 @@ class Exif(dict):
         """
         exifReader = _ExifReader(input_data)
         zeroth_ifd, exif_ifd, gps_ifd = exifReader.get_exif()
-        zeroth_dict = {key: exifReader.get_info(zeroth_ifd[key])
-                       for key in zeroth_ifd if key in TAGS["Image"]}
-        exif_dict = {key: exifReader.get_info(exif_ifd[key])
-                     for key in exif_ifd if key in TAGS["Photo"]}
-        gps_dict = {key: exifReader.get_info(gps_ifd[key])
-                    for key in gps_ifd if key in TAGS["GPSInfo"]}
+        zeroth_dict = dict((key, exifReader.get_info(zeroth_ifd[key]))
+                           for key in zeroth_ifd if key in TAGS["Image"])
+        exif_dict = dict((key, exifReader.get_info(exif_ifd[key]))
+                         for key in exif_ifd if key in TAGS["Photo"])
+        gps_dict = dict((key, exifReader.get_info(gps_ifd[key]))
+                        for key in gps_ifd if key in TAGS["GPSInfo"])
 
         if len(exif_dict):
 ##            zeroth_dict.pop(EXIF_POINTER)
@@ -795,8 +795,10 @@ class Exif(dict):
 
     def _split_ifd(self):
         exif_dict = self
-        zeroth_ifd = {key: exif_dict[key] for key in exif_dict if key in TAGS["Image"]}
-        exif_ifd = {key: exif_dict[key] for key in exif_dict if key in TAGS["Photo"]}
+        zeroth_ifd = dict((key, exif_dict[key])
+                          for key in exif_dict if key in TAGS["Image"])
+        exif_ifd = dict((key, exif_dict[key])
+                        for key in exif_dict if key in TAGS["Photo"])
         gps_ifd = zeroth_ifd[GPS_POINTER] if GPS_POINTER in zeroth_ifd else {}
         return zeroth_ifd, exif_ifd, gps_ifd
 
