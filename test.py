@@ -12,7 +12,6 @@ from EXIF import Exif, GPSGroup, ImageGroup, PhotoGroup
 EXIF_DICT = {
     ImageGroup.ProcessingSoftware: "PIL",  # ascii
     ImageGroup.Make: "Make",  # ascii
-    ImageGroup.Artist: "Mr. Foo",
     ImageGroup.Model: "XXX-XXX",  # ascii
     ImageGroup.ClipPath: 255,  # byte
     ImageGroup.Rating: 65535,  # short
