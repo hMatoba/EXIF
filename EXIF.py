@@ -661,7 +661,7 @@ class _ExifReader(object):
 
         if val[0] == 1:  # BYTE
             if not isinstance(val[2][0], int):
-                data = int(val[2][0].encode("hex"), 16)
+                data = int(val[2][0:1].encode("hex"), 16)
             else:
                 data = val[2][0]
         elif val[0] == 2:  # ASCII
@@ -864,7 +864,7 @@ class Exif(dict):
                     value_str = struct.pack(">I", offset)
                     values += new_value
                 else:
-                    value_str = new_value
+                    value_str = new_value + b"\x00" * (4 - length)
             elif value_type == "Rational":
                 length = 1
                 num, den = raw_value
@@ -882,15 +882,14 @@ class Exif(dict):
                 value_str = struct.pack(">I", offset)
                 values += new_value
             elif value_type == "Undefined":
-                new_value = raw_value.encode()
-                length = len(new_value)
-                if len(raw_value) > 4:
+                length = len(raw_value)
+                if length > 4:
                     offset = (self.TIFF_HEADER_LENGTH + ifd_offset +
                               entries_length + len(values))
                     value_str = struct.pack(">I", offset)
-                    values += new_value
+                    values += raw_value
                 else:
-                    value_str = new_value
+                    value_str = raw_value + b"\x00" * (4 - length)
 
             length_str = struct.pack(">I", length)
             entries += key_str + type_str + length_str + value_str

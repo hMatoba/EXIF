@@ -6,20 +6,22 @@ except ImportError:
     import unittest
 
 from PIL import Image
-from EXIF import Exif, GPSGroup, ImageGroup, PhotoGroup
+from EXIF import Exif, GPSGroup, ImageGroup, PhotoGroup, _ExifReader
 
 
 EXIF_DICT = {
     ImageGroup.ProcessingSoftware: "PIL",  # ascii
     ImageGroup.Make: "Make",  # ascii
     ImageGroup.Model: "XXX-XXX",  # ascii
+    ImageGroup.JPEGTables: b"\xaa\xaa",  # undefined
     ImageGroup.ClipPath: 255,  # byte
     ImageGroup.Rating: 65535,  # short
     ImageGroup.XClipPathUnits: 4294967295,  # long
     ImageGroup.XResolution: (4294967295, 1),  # rational
     ImageGroup.CameraCalibration1: (2147483647, -2147483648),  # srational
     PhotoGroup.DateTimeOriginal: "2099:09:29 10:10:10",  # ascii
-    PhotoGroup.LensMake: "LensMake",  # ascii
+    PhotoGroup.LensMake: "LM",  # ascii
+    PhotoGroup.OECF: b"\xaa\xaa\xaa\xaa\xaa\xaa",  # undefined
     PhotoGroup.Sharpness: 65535,  # short
     PhotoGroup.ISOSpeed: 4294967295,  # long
     PhotoGroup.ExposureTime: (4294967295, 1),  # rational
@@ -48,6 +50,10 @@ class ExifTests(unittest.TestCase):
         f.seek(0)
         im2 = Image.open(f)
         im2.close()
+
+    def test_exif_reader(self):
+        with self.assertRaises(ValueError):
+            _ExifReader("dummy")
 
 
 if __name__ == "__main__":
