@@ -6,31 +6,31 @@ except ImportError:
     import unittest
 
 from PIL import Image
-from EXIF import Exif, GPSGroup, ImageGroup, PhotoGroup, _ExifReader
+from EXIF import Exif, ZerothIFD, ExifIFD, GPSIFD, _ExifReader
 
 
 EXIF_DICT = {
-    ImageGroup.ProcessingSoftware: "PIL",  # ascii
-    ImageGroup.Make: "Make",  # ascii
-    ImageGroup.Model: "XXX-XXX",  # ascii
-    ImageGroup.JPEGTables: b"\xaa\xaa",  # undefined
-    ImageGroup.ClipPath: 255,  # byte
-    ImageGroup.Rating: 65535,  # short
-    ImageGroup.XClipPathUnits: 4294967295,  # long
-    ImageGroup.XResolution: (4294967295, 1),  # rational
-    ImageGroup.CameraCalibration1: (2147483647, -2147483648),  # srational
-    PhotoGroup.DateTimeOriginal: "2099:09:29 10:10:10",  # ascii
-    PhotoGroup.LensMake: "LM",  # ascii
-    PhotoGroup.OECF: b"\xaa\xaa\xaa\xaa\xaa\xaa",  # undefined
-    PhotoGroup.Sharpness: 65535,  # short
-    PhotoGroup.ISOSpeed: 4294967295,  # long
-    PhotoGroup.ExposureTime: (4294967295, 1),  # rational
-    PhotoGroup.ExposureBiasValue: (2147483647, -2147483648),  # srational
-    ImageGroup.GPSTag: {
-        GPSGroup.GPSVersionID: 255,  # byte
-        GPSGroup.GPSDateStamp: "1999:99:99 99:99:99",  # ascii
-        GPSGroup.GPSDifferential: 65535,  # short
-        GPSGroup.GPSLatitude: (4294967295, 1),  # rational
+    ZerothIFD.ProcessingSoftware: "PIL",  # ascii
+    ZerothIFD.Make: "Make",  # ascii
+    ZerothIFD.Model: "XXX-XXX",  # ascii
+    ZerothIFD.JPEGTables: b"\xaa\xaa",  # undefined
+    ZerothIFD.ClipPath: 255,  # byte
+    ZerothIFD.Rating: 65535,  # short
+    ZerothIFD.XClipPathUnits: 4294967295,  # long
+    ZerothIFD.XResolution: (4294967295, 1),  # rational
+    ZerothIFD.CameraCalibration1: (2147483647, -2147483648),  # srational
+    ExifIFD.DateTimeOriginal: "2099:09:29 10:10:10",  # ascii
+    ExifIFD.LensMake: "LM",  # ascii
+    ExifIFD.OECF: b"\xaa\xaa\xaa\xaa\xaa\xaa",  # undefined
+    ExifIFD.Sharpness: 65535,  # short
+    ExifIFD.ISOSpeed: 4294967295,  # long
+    ExifIFD.ExposureTime: (4294967295, 1),  # rational
+    ExifIFD.ExposureBiasValue: (2147483647, -2147483648),  # srational
+    ZerothIFD.GPSTag: {
+        GPSIFD.GPSVersionID: 255,  # byte
+        GPSIFD.GPSDateStamp: "1999:99:99 99:99:99",  # ascii
+        GPSIFD.GPSDifferential: 65535,  # short
+        GPSIFD.GPSLatitude: (4294967295, 1),  # rational
         }
     }
 

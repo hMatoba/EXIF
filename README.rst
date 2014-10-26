@@ -13,17 +13,17 @@ How to Use
     from PIL import Image
     from EXIF import *
 
-    d = {ImageGroup.ProcessingSoftware: "PIL",
-         ImageGroup.Model: "XXX-XXX",
-         ImageGroup.XResolution: (300, 1),
-         ImageGroup.YResolution: (200, 1),
-         ImageGroup.Rating: 3,
-         PhotoGroup.DateTimeOriginal: "2099:09:29 10:10:10",
-         PhotoGroup.Sharpness: 1,
-         PhotoGroup.LensMake: "LensMake",
-         ImageGroup.GPSTag: {GPSGroup.GPSVersionID: 2,
-                             GPSGroup.GPSLatitude: (1, 300),
-                             GPSGroup.GPSDateStamp: "1999:99:99 99:99:99"}}
+    d = {ZerothIFD.ProcessingSoftware: "PIL",
+         ZerothIFD.Model: "XXX-XXX",
+         ZerothIFD.XResolution: (300, 1),
+         ZerothIFD.YResolution: (200, 1),
+         ZerothIFD.Rating: 3,
+         ExifIFD.DateTimeOriginal: "2099:09:29 10:10:10",
+         ExifIFD.Sharpness: 1,
+         ExifIFD.LensMake: "LensMake",
+         ZerothIFD.GPSTag: {GPSIFD.GPSVersionID: 2,
+                            GPSIFD.GPSLatitude: (1, 300),
+                            GPSIFD.GPSDateStamp: "1999:99:99 99:99:99"}}
     exif = Exif()
     exif.update(d)
     exif[271] = "Make"
