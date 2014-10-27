@@ -51,9 +51,28 @@ class ExifTests(unittest.TestCase):
         im2 = Image.open(f)
         im2.close()
 
-    def test_exif_reader(self):
+    def test_no_exif_file_generate(self):
+        f = io.BytesIO()
+        exif = Exif({})
+        im1 = Image.new("RGBA", (16, 16))
+        im1.save(f, format="JPEG", exif=exif.to_bytes())
+        f.seek(0)
+        im2 = Image.open(f)
+        im2.close()
+
+    def test_init_ExifReader(self):
         with self.assertRaises(ValueError):
             _ExifReader("dummy")
+
+    def test_init_Exif(self):
+        with self.assertRaises(ValueError):
+            Exif(0)
+
+        exif = Exif()
+        self.assertDictEqual(exif, {})
+
+        exif2 = Exif(exif.to_bytes())
+        self.assertDictEqual(exif2, {})
 
 
 if __name__ == "__main__":

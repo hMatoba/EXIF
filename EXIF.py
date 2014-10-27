@@ -719,7 +719,6 @@ class Exif(dict):
     TIFF_HEADER_LENGTH = 8
 
     def __init__(self, data=None):
-        pass
         if isinstance(data, (bytes, str)):
             self.load(data)
         elif isinstance(data, dict):
