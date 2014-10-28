@@ -19,6 +19,7 @@ EXIF_DICT = {
     ZerothIFD.XClipPathUnits: 4294967295,  # long
     ZerothIFD.XResolution: (4294967295, 1),  # rational
     ZerothIFD.CameraCalibration1: (2147483647, -2147483648),  # srational
+    ZerothIFD.BlackLevelDeltaH: ((1, 1), (1, 1), (1, 1), ),  # srational
     ExifIFD.DateTimeOriginal: "2099:09:29 10:10:10",  # ascii
     ExifIFD.LensMake: "LM",  # ascii
     ExifIFD.OECF: b"\xaa\xaa\xaa\xaa\xaa\xaa",  # undefined
@@ -26,6 +27,7 @@ EXIF_DICT = {
     ExifIFD.ISOSpeed: 4294967295,  # long
     ExifIFD.ExposureTime: (4294967295, 1),  # rational
     ExifIFD.ExposureBiasValue: (2147483647, -2147483648),  # srational
+    ExifIFD.LensSpecification: ((1, 1), (1, 1), (1, 1), (1, 1), ),  # rational
     ZerothIFD.GPSTag: {
         GPSIFD.GPSVersionID: 255,  # byte
         GPSIFD.GPSDateStamp: "1999:99:99 99:99:99",  # ascii
@@ -60,11 +62,15 @@ class ExifTests(unittest.TestCase):
         im2 = Image.open(f)
         im2.close()
 
-    def test_init_ExifReader(self):
+    def test_ExifReader(self):
         with self.assertRaises(ValueError):
             _ExifReader("dummy")
 
-    def test_init_Exif(self):
+        with self.assertRaises(ValueError):
+            e = _ExifReader(b"Exif\x00\x00")
+            e.get_info((100, 1, b"dummy"))
+
+    def test_Exif(self):
         with self.assertRaises(ValueError):
             Exif(0)
 
