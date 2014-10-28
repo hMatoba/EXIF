@@ -683,8 +683,11 @@ class _ExifReader(object):
             length = val[1]
             if length > 1:
                 data = tuple(
-                    (struct.unpack(self.endian_mark + "L", self.exif_str[pointer + x * 8: pointer + 4 + x * 8])[0],
-                     struct.unpack(self.endian_mark + "L", self.exif_str[pointer + 4 + x * 8: pointer + 8 + x * 8])[0])
+                    (struct.unpack(self.endian_mark + "L",
+                       self.exif_str[pointer + x * 8: pointer + 4 + x * 8])[0],
+                     struct.unpack(self.endian_mark + "L",
+                       self.exif_str[pointer + 4 + x * 8: pointer + 8 + x * 8]
+                     )[0])
                     for x in range(val[1])
                 )
             else:
@@ -707,6 +710,9 @@ class _ExifReader(object):
                                   self.exif_str[pointer: pointer + 4])[0],
                     struct.unpack(self.endian_mark + "l",
                                   self.exif_str[pointer + 4: pointer + 8])[0])
+        else:
+            raise ValueError("'_ExifReader.get_info' got Invalid value type." +
+                             "Exif of given file might be broken.")
 
         return data
 
@@ -889,6 +895,9 @@ class Exif(dict):
                     values += raw_value
                 else:
                     value_str = raw_value + b"\x00" * (4 - length)
+            else:
+                raise ValueError("'Exif._dict_to_bytes'" +
+                                 " got Invalid value type")
 
             length_str = struct.pack(">I", length)
             entries += key_str + type_str + length_str + value_str
