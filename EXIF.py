@@ -1,4 +1,11 @@
 import struct
+import sys
+
+
+if sys.version_info[0] == 2:
+    NUMBER_TYPE = (int, long)
+else:
+    NUMBER_TYPE = int
 
 
 TAGS = {
@@ -683,12 +690,12 @@ class _ExifReader(object):
             length = val[1]
             if length > 1:
                 data = tuple(
-                    (struct.unpack(self.endian_mark + "L",
-                       self.exif_str[pointer + x * 8: pointer + 4 + x * 8])[0],
-                     struct.unpack(self.endian_mark + "L",
-                       self.exif_str[pointer + 4 + x * 8: pointer + 8 + x * 8]
-                     )[0])
-                    for x in range(val[1])
+                  (struct.unpack(self.endian_mark + "L",
+                    self.exif_str[pointer + x * 8: pointer + 4 + x * 8])[0],
+                   struct.unpack(self.endian_mark + "L",
+                    self.exif_str[pointer + 4 + x * 8: pointer + 8 + x * 8])[0]
+                   )
+                  for x in range(val[1])
                 )
             else:
                 data = (
@@ -706,7 +713,19 @@ class _ExifReader(object):
             data = struct.unpack(self.endian_mark + "l", val[2])[0]
         elif val[0] == 10:  # SRATIONAL
             pointer = struct.unpack(self.endian_mark + "L", val[2])[0]
-            data = (struct.unpack(self.endian_mark + "l",
+            length = val[1]
+            if length > 1:
+                data = tuple(
+                  (struct.unpack(self.endian_mark + "l",
+                    self.exif_str[pointer + x * 8: pointer + 4 + x * 8])[0],
+                   struct.unpack(self.endian_mark + "l",
+                    self.exif_str[pointer + 4 + x * 8: pointer + 8 + x * 8])[0]
+                   )
+                  for x in range(val[1])
+                )
+            else:
+                data = (
+                    struct.unpack(self.endian_mark + "l",
                                   self.exif_str[pointer: pointer + 4])[0],
                     struct.unpack(self.endian_mark + "l",
                                   self.exif_str[pointer + 4: pointer + 8])[0])
@@ -871,17 +890,34 @@ class Exif(dict):
                 else:
                     value_str = new_value + b"\x00" * (4 - length)
             elif value_type == "Rational":
-                length = 1
-                num, den = raw_value
-                new_value = struct.pack(">L", num) + struct.pack(">L", den)
+                if isinstance(raw_value[0], NUMBER_TYPE):
+                    length = 1
+                    num, den = raw_value
+                    new_value = struct.pack(">L", num) + struct.pack(">L", den)
+                elif isinstance(raw_value[0], tuple):
+                    length = len(raw_value)
+                    new_value = b""
+                    for n, val in enumerate(raw_value):
+                        num, den = val
+                        new_value += (struct.pack(">L", num) +
+                                      struct.pack(">L", den))
                 offset = (self.TIFF_HEADER_LENGTH + ifd_offset +
                           entries_length + len(values))
                 value_str = struct.pack(">I", offset)
                 values += new_value
             elif value_type == "SRational":
-                length = 1
-                num, den = raw_value
-                new_value = struct.pack(">l", num) + struct.pack(">l", den)
+                if isinstance(raw_value[0], NUMBER_TYPE):
+                    length = 1
+                    num, den = raw_value
+                    new_value = (struct.pack(">l", num) +
+                                 struct.pack(">l", den))
+                elif isinstance(raw_value[0], tuple):
+                    length = len(raw_value)
+                    new_value = b""
+                    for n, val in enumerate(raw_value):
+                        num, den = val
+                        new_value += (struct.pack(">l", num) +
+                                      struct.pack(">l", den))
                 offset = (self.TIFF_HEADER_LENGTH + ifd_offset +
                           entries_length + len(values))
                 value_str = struct.pack(">I", offset)
