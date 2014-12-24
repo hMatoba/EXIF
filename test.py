@@ -1,4 +1,5 @@
 import io
+import os
 
 try:
     import unittest2 as unittest
@@ -36,6 +37,8 @@ EXIF_DICT = {
         }
     }
 
+INPUT_FILE_JPG = os.path.join("images", "01.jpg")
+INPUT_FILE_TIF = os.path.join("images", "01.tif")
 
 class ExifTests(unittest.TestCase):
     def test_roundtrip(self):
@@ -55,7 +58,7 @@ class ExifTests(unittest.TestCase):
 
     def test_no_exif_file_generate(self):
         f = io.BytesIO()
-        exif = Exif({})
+        exif = Exif()
         im1 = Image.new("RGBA", (16, 16))
         im1.save(f, format="JPEG", exif=exif.to_bytes())
         f.seek(0)
@@ -79,6 +82,46 @@ class ExifTests(unittest.TestCase):
 
         exif2 = Exif(exif.to_bytes())
         self.assertDictEqual(exif2, {})
+
+    def test_load_jpg(self):
+        f = io.BytesIO()
+        exif = Exif(INPUT_FILE_JPG)
+        im1 = Image.new("RGBA", (16, 16))
+        im1.save(f, format="JPEG", exif=exif.to_bytes())
+        f.seek(0)
+        im2 = Image.open(f)
+        im2.close()
+
+    def test_load_tif(self):
+        f = io.BytesIO()
+        exif = Exif(INPUT_FILE_TIF)
+        im1 = Image.new("RGBA", (16, 16))
+        im1.save(f, format="JPEG", exif=exif.to_bytes())
+        f.seek(0)
+        im2 = Image.open(f)
+        im2.close()
+
+    def test_load_jpeg_on_memory(self):
+        with open(INPUT_FILE_JPG, "rb") as f:
+            data = f.read()
+        f = io.BytesIO()
+        exif = Exif(data)
+        im1 = Image.new("RGBA", (16, 16))
+        im1.save(f, format="JPEG", exif=exif.to_bytes())
+        f.seek(0)
+        im2 = Image.open(f)
+        im2.close()
+
+    def test_load_tif_on_memory(self):
+        with open(INPUT_FILE_TIF, "rb") as f:
+            data = f.read()
+        f = io.BytesIO()
+        exif = Exif(data)
+        im1 = Image.new("RGBA", (16, 16))
+        im1.save(f, format="JPEG", exif=exif.to_bytes())
+        f.seek(0)
+        im2 = Image.open(f)
+        im2.close()
 
 
 if __name__ == "__main__":

@@ -24,7 +24,8 @@ How to Use
          ZerothIFD.GPSTag: {GPSIFD.GPSVersionID: 2,
                             GPSIFD.GPSLatitude: (1, 300),
                             GPSIFD.GPSDateStamp: "1999:99:99 99:99:99"}}
-    exif = Exif()
+    exif = Exif()  # or 'Exif(jpeg_file_path)', 'Exif(tif_file_path)',
+                   #    'Exif(jpeg_bytes)', 'Exif(tif_bytes)'
     exif.update(d)
     exif[271] = "Make"
     im1 = Image.new("RGBA", (16, 16))

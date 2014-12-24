@@ -613,20 +613,42 @@ class _ExifReader(object):
     LITTLE_ENDIAN = b"\x49\x49"
 
     def __init__(self, data):
-        if data[0: 6] == b"Exif\x00\x00":
-            self.exif_str = data[6:]
-            endian = self.exif_str[0:2]
-            if endian == self.LITTLE_ENDIAN:
-                self.endian_mark = "<"
-            else:
-                self.endian_mark = ">"
+        if data[0:6] == b"Exif\x00\x00":
+            pass
+        elif data[0:2] in (b"\xff\xd8", b"\x49\x49", b"\x4d4d"):
+            pass
+        elif (data[-4:].lower().encode() in
+              (b".jpg", b"jpeg", b".jpe", b".tif", b"tiff")):
+            with open(data, 'rb') as f:
+                data = f.read()
         else:
-            raise ValueError("Given data is not Exif")
+            raise ValueError("Given file is neither JPEG nor TIFF.")
+
+        if data[0:6] == b"Exif\x00\x00":
+            self.exif_str = data[6:]
+        elif data[0:2] == b"\xff\xd8":
+            segments = _split_into_segments(data)
+            app1 = _get_app1(segments)
+
+            if app1:
+                self.exif_str = app1[10:]
+            else:
+                self.exif_str = None
+        elif data[0:2] in (b"\x49\x49", b"\x4d4d"):
+            self.exif_str = data
+        else:
+            raise ValueError("Given file is neither JPEG nor TIFF.")
 
     def get_exif(self):
+        if self.exif_str is None:
+            raise ValueError("exif_str is empty.")
         exif_dict = {}
         gps_dict = {}
 
+        if self.exif_str[0:2] == b"\x49\x49":
+            self.endian_mark = "<"
+        else:
+            self.endian_mark = ">"
         pointer = struct.unpack(self.endian_mark + "L", self.exif_str[4:8])[0]
         zeroth_dict = self.get_ifd_dict(pointer)
 
@@ -818,21 +840,24 @@ class Exif(dict):
         """Loads exif as dict from exif bytes
         """
         exif_reader = _ExifReader(input_data)
-        zeroth_ifd, exif_ifd, gps_ifd = exif_reader.get_exif()
-        zeroth_dict = dict((key, exif_reader.get_info(zeroth_ifd[key]))
-                           for key in zeroth_ifd if key in TAGS["Zeroth"])
-        exif_dict = dict((key, exif_reader.get_info(exif_ifd[key]))
-                         for key in exif_ifd if key in TAGS["Exif"])
-        gps_dict = dict((key, exif_reader.get_info(gps_ifd[key]))
-                        for key in gps_ifd if key in TAGS["GPSInfo"])
+        if exif_reader.exif_str is None:
+            pass
+        else:
+            zeroth_ifd, exif_ifd, gps_ifd = exif_reader.get_exif()
+            zeroth_dict = dict((key, exif_reader.get_info(zeroth_ifd[key]))
+                               for key in zeroth_ifd if key in TAGS["Zeroth"])
+            exif_dict = dict((key, exif_reader.get_info(exif_ifd[key]))
+                             for key in exif_ifd if key in TAGS["Exif"])
+            gps_dict = dict((key, exif_reader.get_info(gps_ifd[key]))
+                            for key in gps_ifd if key in TAGS["GPSInfo"])
 
-        if len(exif_dict):
-            # zeroth_dict.pop(EXIF_POINTER)
-            zeroth_dict.update(exif_dict)
-        if len(gps_dict):
-            zeroth_dict.update({GPS_POINTER: gps_dict})
-        self.clear()
-        self.update(zeroth_dict)
+            if len(exif_dict):
+                # zeroth_dict.pop(EXIF_POINTER)
+                zeroth_dict.update(exif_dict)
+            if len(gps_dict):
+                zeroth_dict.update({GPS_POINTER: gps_dict})
+            self.clear()
+            self.update(zeroth_dict)
 
     def _split_ifd(self):
         exif_dict = self
@@ -938,3 +963,37 @@ class Exif(dict):
             length_str = struct.pack(">I", length)
             entries += key_str + type_str + length_str + value_str
         return (entry_header + entries, values)
+
+
+def _split_into_segments(data):
+    """Slices JPEG meta data into a list from JPEG binary data.
+    """
+    if data[0:2] != b"\xff\xd8":
+        raise ValueError("Given data isn't JPEG.")
+
+    head = 2
+    segments = [b"\xff\xd8"]
+    while 1:
+        if data[head: head + 2] == b"\xff\xda":
+            segments.append(data[head:])
+            break
+        else:
+            length = struct.unpack(">H", data[head + 2: head + 4])[0]
+            endPoint = head + length + 2
+            seg = data[head: endPoint]
+            segments.append(seg)
+            head = endPoint
+
+        if (head >= len(data)):
+            raise ValueError("Wrong JPEG data.")
+
+    return segments
+
+
+def _get_app1(segments):
+    """Returns Exif from JPEG meta data list
+    """
+    for seg in segments:
+        if seg[0:2] == b"\xff\xe1":
+            return seg
+    return None
