@@ -621,7 +621,7 @@ class _ExifReader(object):
             else:
                 self.endian_mark = ">"
         else:
-            raise ValueError("Given data in not Exif")
+            raise ValueError("Given data is not Exif")
 
     def get_exif(self):
         exif_dict = {}
