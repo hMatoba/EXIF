@@ -3,6 +3,8 @@ EXIF
 
 |Build Status| |Coverage Status|
 
+Stops developing. See also: https://github.com/hMatoba/Piexif
+
 Use EXIF object with PIL or Pillow.
 
 How to Use
